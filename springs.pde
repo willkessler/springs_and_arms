@@ -19,10 +19,10 @@ float angleBetweenVectors(PVector v1, PVector v2) {
 void setup() {
   size(500,500);
   gravity = 30;
-  mass = 350;
+  mass = 1000;
   anchor = new PVector(width / 2, height / 2);
-  k = 1;
-  dampener = 0.999;
+  k = 2;
+  dampener = 0.995;
   angle = 45;
   angularVel = 0;
   angularAccel = 10;
