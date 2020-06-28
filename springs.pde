@@ -4,9 +4,9 @@ float mass;
 float k;
 float dampener;
 PVector anchor, particlePrev, particleNext;
-float angle, radAngle, angularVel, angularAccel, angularForce;
 float armLength;
 PVector particle, particleVel, vecToCenter, springAxis, springForceVector;
+Spring[] armParts;
 
 // see: https://www.euclideanspace.com/maths/algebra/vectors/angleBetween/
 float angleBetweenVectors(PVector v1, PVector v2) {
@@ -23,11 +23,9 @@ void setup() {
   anchor = new PVector(width / 2, height / 2);
   k = 2;
   dampener = 0.995;
-  angle = 45;
-  angularVel = 0;
-  angularAccel = 10;
   armLength = 100;
-  particlePrev = new PVector(anchor.x + armLength,anchor.y);
+  armParts = new Spring[2];
+  particlePrev = new PVector(anchor.x + armLength, anchor.y);
   particleNext = new PVector(0,0);
   vecToCenter = new PVector(0,0);
   particleVel = new PVector(0,-10);
@@ -58,19 +56,16 @@ void draw() {
   
   particleNext.set(anchor.x + vecToCenter.x, anchor.y + vecToCenter.y);
   
-  
   particleVel.set(particleNext.x - particlePrev.x, particleNext.y - particlePrev.y);
   particlePrev.set(particleNext);
   particleVel.mult(dampener);
                     
-    // DRAW SPRING-MASS
-    color(0);
-    stroke(0);
-    background(255, 255, 255);
-    rect(anchor.x - 5, anchor.y - 5, 10, 10);
-    //line(anchorX,anchorY, positionX, positionY);
-    //ellipse(positionX, positionY, 10, 10);
-    line(anchor.x, anchor.y, particleNext.x, particleNext.y);
-    ellipse(particleNext.x, particleNext.y,10,10);
+  // DRAW SPRING-MASS
+  color(0);
+  stroke(0);
+  background(255, 255, 255);
+  rect(anchor.x - 5, anchor.y - 5, 10, 10);
+  line(anchor.x, anchor.y, particleNext.x, particleNext.y);
+  ellipse(particleNext.x, particleNext.y,10,10);
 
 };
