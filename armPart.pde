@@ -1,30 +1,43 @@
 class ArmPart {
-  PVector anchor, armPrevEnd, armNextEnd;
+  PVector anchor, armPrevEnd, armNextEnd, parentArmEnd;
   PVector armVector, armVel, springAxis, vecToAnchor, springForceVector;
   float armLength;
   float mass;
   float k;
   float dampener;
+  ArmPart parent;
   
-  ArmPart(PVector anc, float al, float kVal, float dampenerVal, float m ) {
+  ArmPart(ArmPart p, PVector anc, float al, float kVal, float dampenerVal, float m ) {
+    parent = p;
     mass = m;
-    anchor = new PVector(width / 2, height / 2);
     k = kVal;
     armLength = al;
     dampener = dampenerVal;
     
     anchor = new PVector(anc.x, anc.y);
     vecToAnchor = new PVector(0,0);
-    armNextEnd = new PVector(0,0);
-    armPrevEnd = new PVector(anchor.x, anchor.y + armLength);
+    armPrevEnd = new PVector(anchor.x + armLength, anchor.y );
+    armNextEnd = new PVector(anchor.x + armLength, anchor.y);
     armVector = new PVector(0,0);
-    armVel = new PVector(0,-10);
+    armVel = new PVector(0,0);
     springAxis = new PVector(1,0);
     springForceVector = new PVector(0,0);  
   }
   
+  PVector getArmEnd() {
+    return armNextEnd;
+  }
+  
+  void applyVelocity(PVector vel) {
+    armVel.add(vel);
+  }
+  
   void update() {
     // Put a particle in motion
+    if (parent != null) {
+      parentArmEnd = parent.getArmEnd();
+      anchor.set(parentArmEnd.x, parentArmEnd.y);
+    }
     armNextEnd.set(armPrevEnd);
     armNextEnd.add(armVel);
     vecToAnchor.set(armNextEnd.x - anchor.x, armNextEnd.y - anchor.y);

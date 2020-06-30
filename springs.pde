@@ -1,11 +1,9 @@
 // INITIAL SETTINGS
-float mass;
-float k;
-float dampener;
-PVector anchor, particlePrev, particleNext;
-float armLength;
-PVector particle, particleVel, vecToCenter, springAxis, springForceVector;
+float [] ks = {2,4,8};
+float [] armLengths = {80,50,30};
+float [] masses = {1000,1000,1000};
 ArmPart[] armParts;
+int felix = 5;
 
 // see: https://www.euclideanspace.com/maths/algebra/vectors/angleBetween/
 float angleBetweenVectors(PVector v1, PVector v2) {
@@ -16,32 +14,38 @@ float angleBetweenVectors(PVector v1, PVector v2) {
 }
 
 void setup() {
-  size(500,500);
-  mass = 1000;
-  anchor = new PVector(width / 2, height / 2);
-  k = 2;
-  dampener = 0.995;
-  armLength = 100;
-  armParts = new ArmPart[2];
-  armParts[0] = new ArmPart(anchor, armLength, k, dampener, 1000);
-  //particlePrev = new PVector(anchor.x + armLength, anchor.y);
-  //particleNext = new PVector(0,0);
-  //vecToCenter = new PVector(0,0);
-  //particleVel = new PVector(0,-10);
-  //springAxis = new PVector(1,0);
-  //springForceVector = new PVector(0,0);
+  size(1000,500);
+  PVector anchor = new PVector(0,0);
+  float dampener = .996;
+  armParts = new ArmPart[3];
+  armParts[0] = new ArmPart(null,        anchor,                   armLengths[0], ks[0], dampener, masses[0]);
+  armParts[1] = new ArmPart(armParts[0], armParts[0].getArmEnd(),  armLengths[1], ks[1], dampener, masses[1]);
+  armParts[2] = new ArmPart(armParts[1], armParts[1].getArmEnd(),  armLengths[2], ks[2], dampener, masses[2]);
+  armParts[0].applyVelocity(new PVector(0,-5));
+  armParts[1].applyVelocity(new PVector(0,-7));
+  armParts[2].applyVelocity(new PVector(0,-5));
+
+felix = 6;
+  println(felix);
 }
 
 // DRAW FUNCTION
 void draw() {
                     
   // DRAW SPRING-MASS
+
+  background(255, 255, 255);
   color(0);
   stroke(0);
-  background(255, 255, 255);
   
-  armParts[0].update();
-  armParts[0].render();
-  
+  pushMatrix();
+  translate(width/2,height/2);
+  int i = 0;
+  while (i < 3) {
+    armParts[i].update();
+    armParts[i].render();
+    i = i + 1;
+  }
+  popMatrix();
   
 };
