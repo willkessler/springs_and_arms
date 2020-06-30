@@ -1,6 +1,6 @@
 // INITIAL SETTINGS
-float [] ks = {1.5,2,2};
-float [] armLengths = {80,50,30};
+float [] ks = {1.5,10,7};
+float [] armLengths = {80,80,70};
 float [] masses = {1000,20,20};
 ArmPart[] armParts;
 int numArmParts = 3;
@@ -19,8 +19,8 @@ float angleBetweenVectors(PVector v1, PVector v2) {
 
 void flap() {
   armParts[0].applyAngularVelocity(5);
-  armParts[1].applyAngularVelocity(0);
-  armParts[2].applyAngularVelocity(0);
+  //armParts[1].applyAngularVelocity(0);
+  //armParts[2].applyAngularVelocity(10);
 }
 
 void setup() {
