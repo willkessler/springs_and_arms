@@ -1,12 +1,15 @@
 class ArmPart {
   PVector anchor, armPrevEnd, armNextEnd, parentArmEnd;
   PVector armVector, armVel, springAxis, springForceVector;
+  PVector gravityVector;
   float armLength;
   float mass;
   float k;
   float dampener;
   int armId;
   ArmPart parent;
+  boolean applySpringForce;
+  float gravityForce = .005;
   
   ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float dampenerVal, float m, float angleOffParent ) {
     parent = p;
@@ -31,7 +34,9 @@ class ArmPart {
     armVel = new PVector(0,0);
     springForceVector = new PVector(0,0);
     
-  
+    applySpringForce = true;
+    gravityVector = new PVector(0,gravityForce);
+
   }
   
   PVector getArmEnd() {
@@ -42,6 +47,10 @@ class ArmPart {
      PVector armVec = new PVector(armNextEnd.x - anchor.x, armNextEnd.y - anchor.y);
      armVec.normalize();
      return armVec;
+  }
+  
+  void setApplySpringForce(boolean newVal) {
+    applySpringForce = newVal;
   }
   
   void applyAngularVelocity(float vel) {
@@ -61,18 +70,23 @@ class ArmPart {
     armNextEnd.add(armVel);
     armVector = getArmVector();
  
-    //float angleToXAxis = -atan2(armVector.y, armVector.x);
-    float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
-    float signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x; // cross prod of 2 2d vecs, cf source of https://chipmunk-physics.net/
-    float springForce = signOfForce * k * radians(angleToSpringAxis);
-    float springAccel = springForce / mass; // radial acceleration caused by spring
-    // spring force acceleration vector is tangential to unit circle at current angle, or, opposite current velocity vector
-    springForceVector.set(armVector);
-    springForceVector.rotate(radians(-90));
-    springForceVector.mult(springAccel);
-    armVector.add(springForceVector);
-    //println(degrees(angleToXAxis), springAccel);
+    if (applySpringForce) {
+      //float angleToXAxis = -atan2(armVector.y, armVector.x);
+      float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
+      // cross prod of 2 2d vecs, cf source of https://chipmunk-physics.net/
+      // also see https://stackoverflow.com/questions/243945/calculating-a-2d-vectors-cross-product#:~:text=You%20can't%20do%20a,vectors%20on%20the%20xy%2Dplane.
+      float signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x; 
+      float springForce = signOfForce * k * radians(angleToSpringAxis);
+      float springAccel = springForce / mass; // radial acceleration caused by spring
+      // spring force acceleration vector is tangential to unit circle at current angle, or, opposite current velocity vector
+      springForceVector.set(armVector);
+      springForceVector.rotate(radians(-90));
+      springForceVector.mult(springAccel);
+      armVector.add(springForceVector);
+      //println(degrees(angleToXAxis), springAccel);
+    }
     
+    armVector.add(gravityVector);
     armVector.mult(armLength);
     
     armNextEnd.set(anchor.x + armVector.x, anchor.y + armVector.y);

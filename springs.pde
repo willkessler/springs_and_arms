@@ -2,6 +2,7 @@
 float [] ks = {1.5,10,7};
 float [] armLengths = {80,80,70};
 float [] masses = {1000,20,20};
+float [] dampeners = {0.99, .5, .5};
 ArmPart[] armParts;
 int numArmParts = 3;
 
@@ -18,7 +19,7 @@ float angleBetweenVectors(PVector v1, PVector v2) {
 }
 
 void flap() {
-  armParts[0].applyAngularVelocity(5);
+  armParts[0].applyAngularVelocity(-5);
   //armParts[1].applyAngularVelocity(0);
   //armParts[2].applyAngularVelocity(10);
 }
@@ -26,11 +27,12 @@ void flap() {
 void setup() {
   size(1000,500);
   PVector anchor = new PVector(0,0);
-  float dampener = .99;
   armParts = new ArmPart[numArmParts];
-  armParts[0] = new ArmPart(0, null,        anchor,                   armLengths[0], ks[0], dampener, masses[0], -35);
-  armParts[1] = new ArmPart(1, armParts[0], armParts[0].getArmEnd(),  armLengths[1], ks[1], dampener, masses[1], 25);
-  armParts[2] = new ArmPart(2, armParts[1], armParts[1].getArmEnd(),  armLengths[2], ks[2], dampener, masses[2], -15);
+  armParts[0] = new ArmPart(0, null,        anchor,                   armLengths[0], ks[0], dampeners[0], masses[0], -35);
+  armParts[1] = new ArmPart(1, armParts[0], armParts[0].getArmEnd(),  armLengths[1], ks[1], dampeners[1], masses[1], -35);
+  armParts[2] = new ArmPart(2, armParts[1], armParts[1].getArmEnd(),  armLengths[2], ks[2], dampeners[2], masses[2], -15);
+  armParts[1].setApplySpringForce(false);
+  armParts[2].setApplySpringForce(false);
   flap();
 }
 
