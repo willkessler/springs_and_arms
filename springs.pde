@@ -1,5 +1,5 @@
 // INITIAL SETTINGS
-float [] ks = {2.5,15,2000};
+float [] ks = {2.5,55,2000};
 float [] armLengths = {80,80,70};
 float [] masses = {100,100,2000};
 float [] dampeners = {0.99, .99, .99};
@@ -27,6 +27,14 @@ void flap(float[] forces) {
   }
 }
 
+void mousePressed() {
+  float divisor = 10;
+  float pulse = (mouseY / divisor) * random(0,1);
+  float forceAmts[] = {pulse, pulse, 0};
+  flap(forceAmts);
+}
+
+
 void setup() {
   size(1000,500);
   PVector anchor = new PVector(0,0);
@@ -46,11 +54,6 @@ void setup() {
   flap(flapForces);
 }
 
-void mousePressed() {
-  float divisor = 10;
-  float forceAmts[] = { (mouseY / divisor) * random(0,1), (mouseY / divisor) * random(0, 0.25), 0};
-  flap(forceAmts);
-}
 
 // DRAW FUNCTION
 void draw() {
