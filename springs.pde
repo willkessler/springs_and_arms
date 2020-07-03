@@ -1,5 +1,5 @@
 // INITIAL SETTINGS
-float [] ks = {2.5,6,2000};
+float [] ks = {2.5,15,2000};
 float [] armLengths = {80,80,70};
 float [] masses = {100,100,2000};
 float [] dampeners = {0.99, .99, .99};
@@ -47,7 +47,8 @@ void setup() {
 }
 
 void mousePressed() {
-  float forceAmts[] = { mouseY * random(0,1), mouseY * random(0, 0.25), 0};
+  float divisor = 10;
+  float forceAmts[] = { (mouseY / divisor) * random(0,1), (mouseY / divisor) * random(0, 0.25), 0};
   flap(forceAmts);
 }
 
