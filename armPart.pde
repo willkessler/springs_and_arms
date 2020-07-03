@@ -1,6 +1,6 @@
 class ArmPart {
   PVector anchor, armPrevEnd, armNextEnd, parentArmEnd;
-  PVector armVector, armVel, springAxis, springForceVector;
+  PVector armVector, armVel, springAxis, springForceVector, tangentialAccelVector;
   PVector gravityVector;
   float armLength;
   float mass;
@@ -9,6 +9,7 @@ class ArmPart {
   int armId;
   ArmPart parent;
   boolean applySpringForce;
+  boolean applyGravity;
   float gravityForce = .005;
   
   ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float dampenerVal, float m, float angleOffParent ) {
@@ -33,8 +34,10 @@ class ArmPart {
     armVector = new PVector(0,0);
     armVel = new PVector(0,0);
     springForceVector = new PVector(0,0);
+    tangentialAccelVector = new PVector(0,0);
     
     applySpringForce = true;
+    applyGravity = true;
     gravityVector = new PVector(0,gravityForce);
 
   }
@@ -49,16 +52,20 @@ class ArmPart {
      return armVec;
   }
   
+  void setApplyGravity(boolean newVal) {
+    applyGravity = newVal;
+  }
+  
   void setApplySpringForce(boolean newVal) {
     applySpringForce = newVal;
   }
   
-  void applyAngularVelocity(float vel) {
-    PVector velVector = getArmVector();
-    velVector.normalize();
-    velVector.rotate(radians(90));
-    velVector.mult(vel);
-    armVel.add(velVector);
+  // accel = force / m
+  void applyTangentialForce(float force) {
+    tangentialAccelVector = getArmVector();
+    float acceleration = force / mass;
+    tangentialAccelVector.rotate(radians(90));
+    tangentialAccelVector.mult(acceleration);
   }
   
   void update() {    
@@ -86,7 +93,14 @@ class ArmPart {
       //println(degrees(angleToXAxis), springAccel);
     }
     
-    armVector.add(gravityVector);
+    if (applyGravity) {
+      armVector.add(gravityVector);
+    }
+    
+    armVector.add(tangentialAccelVector);
+    tangentialAccelVector.set(0,0);
+    armVector.normalize();
+    
     armVector.mult(armLength);
     
     armNextEnd.set(anchor.x + armVector.x, anchor.y + armVector.y);

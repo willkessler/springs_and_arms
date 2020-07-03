@@ -1,8 +1,11 @@
 // INITIAL SETTINGS
-float [] ks = {1.5,10,7};
+float [] ks = {2.5,10,7};
 float [] armLengths = {80,80,70};
-float [] masses = {1000,20,20};
-float [] dampeners = {0.99, .5, .5};
+float [] masses = {100,20,20};
+float [] dampeners = {0.99, .99, .99};
+float [] angleOffParent = {0, -35, -15 };
+float [] flapForces = {1000,2000,2000};
+
 ArmPart[] armParts;
 int numArmParts = 3;
 
@@ -18,26 +21,34 @@ float angleBetweenVectors(PVector v1, PVector v2) {
   return degrees(angle);
 }
 
-void flap() {
-  armParts[0].applyAngularVelocity(-5);
-  //armParts[1].applyAngularVelocity(0);
-  //armParts[2].applyAngularVelocity(10);
+void flap(float[] forces) {
+  for (int i = 0; i < numArmParts; ++i) {
+    armParts[i].applyTangentialForce(forces[i]);
+  }
 }
 
 void setup() {
   size(1000,500);
   PVector anchor = new PVector(0,0);
   armParts = new ArmPart[numArmParts];
-  armParts[0] = new ArmPart(0, null,        anchor,                   armLengths[0], ks[0], dampeners[0], masses[0], -35);
-  armParts[1] = new ArmPart(1, armParts[0], armParts[0].getArmEnd(),  armLengths[1], ks[1], dampeners[1], masses[1], -35);
-  armParts[2] = new ArmPart(2, armParts[1], armParts[1].getArmEnd(),  armLengths[2], ks[2], dampeners[2], masses[2], -15);
-  armParts[1].setApplySpringForce(false);
-  armParts[2].setApplySpringForce(false);
-  flap();
+  for (int i = 0; i < numArmParts; ++i) {
+    armParts[i] = new ArmPart(i, 
+                              (i == 0 ? null : armParts[i-1]),
+                              (i == 0 ? anchor : armParts[i-1].getArmEnd()),
+                              armLengths[i],
+                              ks[i],
+                              dampeners[i],
+                              masses[i],
+                              angleOffParent[i]);
+    armParts[i].setApplySpringForce(false);
+    armParts[i].setApplyGravity(true);
+  }
+  flap(flapForces);
 }
 
 void mousePressed() {
-  flap();
+  float forceAmts[] = { 0, mouseY * random(-1,1), mouseY * random(-1,1)};
+  flap(forceAmts);
 }
 
 // DRAW FUNCTION
