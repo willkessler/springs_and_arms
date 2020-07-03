@@ -1,9 +1,9 @@
 // INITIAL SETTINGS
-float [] ks = {2.5,10,7};
+float [] ks = {2.5,6,2000};
 float [] armLengths = {80,80,70};
-float [] masses = {100,20,20};
+float [] masses = {100,100,2000};
 float [] dampeners = {0.99, .99, .99};
-float [] angleOffParent = {0, -35, -15 };
+float [] angleOffParent = {-45, 35, 25 };
 float [] flapForces = {1000,2000,2000};
 
 ArmPart[] armParts;
@@ -40,14 +40,14 @@ void setup() {
                               dampeners[i],
                               masses[i],
                               angleOffParent[i]);
-    armParts[i].setApplySpringForce(false);
+    armParts[i].setApplySpringForce(true);
     armParts[i].setApplyGravity(true);
   }
   flap(flapForces);
 }
 
 void mousePressed() {
-  float forceAmts[] = { 0, mouseY * random(-1,1), mouseY * random(-1,1)};
+  float forceAmts[] = { mouseY * random(0,1), mouseY * random(0, 0.25), 0};
   flap(forceAmts);
 }
 

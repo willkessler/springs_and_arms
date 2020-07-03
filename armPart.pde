@@ -99,13 +99,12 @@ class ArmPart {
     
     armVector.add(tangentialAccelVector);
     tangentialAccelVector.set(0,0);
-    armVector.normalize();
     
+    armVector.normalize();
     armVector.mult(armLength);
     
     armNextEnd.set(anchor.x + armVector.x, anchor.y + armVector.y);
     
-
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
     armPrevEnd.set(armNextEnd);
     armVel.mult(dampener);
