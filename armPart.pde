@@ -8,6 +8,7 @@ class ArmPart {
   float dampener;
   float highDampener;
   float angleOffParent;
+  float pumpForce;
   int armId;
   int cycleCount;
   int requestedCycles;
@@ -17,7 +18,7 @@ class ArmPart {
   boolean applyGravity;
   float gravityForce = .005;
   
-  ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float dampenerVal, float highDampenerVal, 
+  ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float pf, float dampenerVal, float highDampenerVal, 
           int requestedCyclesVal, float m, float angleOffParentVal ) {
     parent = p;
     mass = m;
@@ -25,7 +26,8 @@ class ArmPart {
     armLength = al;
     dampener = dampenerVal;
     highDampener = highDampenerVal;
-    requestedCycles = requestedCyclesVal * 2 - 1; // full cycle passes the spring axis twice
+    pumpForce = pf;
+    requestedCycles = requestedCyclesVal * 2 ; // full cycle passes the spring axis twice
     armId = id;
     cycleCount = 0;
     lastSignOfForce = -2;
@@ -94,6 +96,8 @@ class ArmPart {
     armNextEnd.add(armVel);
     armVector = getArmVector();
  
+    boolean pumpTheArm = (cycleCount < requestedCycles);
+    
     if (applySpringForce) {
       //float angleToXAxis = -atan2(armVector.y, armVector.x);
       float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
@@ -119,6 +123,7 @@ class ArmPart {
       armVector.add(gravityVector);
     }
     
+    
     armVector.add(tangentialAccelVector);
     tangentialAccelVector.set(0,0);
     
@@ -129,9 +134,12 @@ class ArmPart {
     
     float armVelYCheck = armVel.y;
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
+    if ((sign(armVelYCheck) == -1) && (sign(armVel.y) == 1) && pumpTheArm) {
+      applyTangentialForce(pumpForce);
+    }
     
     armPrevEnd.set(armNextEnd);
-    float appliedDampener = (cycleCount == requestedCycles ? highDampener : dampener);
+    float appliedDampener = (pumpTheArm ? dampener : highDampener);
     //println("armVel", armVel, "cycleCount", cycleCount, "appliedDampener",  appliedDampener); 
     armVel.mult(appliedDampener);
     

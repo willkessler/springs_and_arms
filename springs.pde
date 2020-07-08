@@ -1,10 +1,10 @@
 // INITIAL SETTINGS
 int numArmParts = 1;
-float [] ks = {2.5,55,2000};
+float [] ks = {1.5,55,2000};
 float [] armLengths = {80,80,70};
 float [] masses = {100,100,2000};
-float [] dampeners = {.995, .99, .99};
-float [] angleOffParent = {-45, 35, 25 };
+float [] dampeners = {.999, .99, .99};
+float [] angleOffParent = {-35, 35, 25 };
 float [] flapForces = {0,2000,2000};
 
 ArmPart[] armParts;
@@ -51,9 +51,10 @@ void setup() {
                               (i == 0 ? anchor : armParts[i-1].getArmEnd()),
                               armLengths[i],
                               ks[i],
+                              75,
                               dampeners[i],
-                              0.65,
-                              3,
+                              0.35,
+                              4,
                               masses[i],
                               angleOffParent[i]);
     armParts[i].setApplySpringForce(true);
