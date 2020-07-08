@@ -1,13 +1,13 @@
 // INITIAL SETTINGS
+int numArmParts = 1;
 float [] ks = {2.5,55,2000};
 float [] armLengths = {80,80,70};
 float [] masses = {100,100,2000};
-float [] dampeners = {0.99, .99, .99};
+float [] dampeners = {.995, .99, .99};
 float [] angleOffParent = {-45, 35, 25 };
-float [] flapForces = {1000,2000,2000};
+float [] flapForces = {0,2000,2000};
 
 ArmPart[] armParts;
-int numArmParts = 3;
 
 // see: https://www.euclideanspace.com/maths/algebra/vectors/angleBetween/
 float angleBetweenVectors(PVector v1, PVector v2) {
@@ -21,15 +21,21 @@ float angleBetweenVectors(PVector v1, PVector v2) {
   return degrees(angle);
 }
 
+int sign(float f) {
+  if(f==0) return(0);
+  return(int(f/abs(f)));
+}
+
 void flap(float[] forces) {
   for (int i = 0; i < numArmParts; ++i) {
+    armParts[i].reset();
     armParts[i].applyTangentialForce(forces[i]);
   }
 }
 
 void mousePressed() {
   float divisor = 10;
-  float pulse = (mouseY / divisor) * random(0,1);
+  float pulse = (mouseY / divisor) ;
   float forceAmts[] = {pulse, pulse, 0};
   flap(forceAmts);
 }
@@ -46,10 +52,12 @@ void setup() {
                               armLengths[i],
                               ks[i],
                               dampeners[i],
+                              0.65,
+                              3,
                               masses[i],
                               angleOffParent[i]);
     armParts[i].setApplySpringForce(true);
-    armParts[i].setApplyGravity(true);
+    armParts[i].setApplyGravity(false);
   }
   flap(flapForces);
 }

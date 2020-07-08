@@ -6,39 +6,36 @@ class ArmPart {
   float mass;
   float k;
   float dampener;
+  float highDampener;
+  float angleOffParent;
   int armId;
+  int cycleCount;
+  int requestedCycles;
+  float lastSignOfForce;
   ArmPart parent;
   boolean applySpringForce;
   boolean applyGravity;
   float gravityForce = .005;
   
-  ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float dampenerVal, float m, float angleOffParent ) {
+  ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float dampenerVal, float highDampenerVal, 
+          int requestedCyclesVal, float m, float angleOffParentVal ) {
     parent = p;
     mass = m;
     k = kVal;
     armLength = al;
     dampener = dampenerVal;
+    highDampener = highDampenerVal;
+    requestedCycles = requestedCyclesVal * 2 - 1; // full cycle passes the spring axis twice
     armId = id;
-    
+    cycleCount = 0;
+    lastSignOfForce = -2;
+    angleOffParent = angleOffParentVal;
     anchor = new PVector(anc.x, anc.y);
-    springAxis = new PVector(1,0);
-    if (p != null) {
-      springAxis = p.getArmVector();
-    }
-    springAxis.rotate(radians(angleOffParent));
-    PVector initialArmVector = new PVector(springAxis.x, springAxis.y);
-    initialArmVector.mult(armLength);
-    armPrevEnd = new PVector(anchor.x + initialArmVector.x, anchor.y + initialArmVector.y );
-    armNextEnd = new PVector(anchor.x + initialArmVector.x, anchor.y + initialArmVector.y );
-  
-    armVector = new PVector(0,0);
-    armVel = new PVector(0,0);
-    springForceVector = new PVector(0,0);
-    tangentialAccelVector = new PVector(0,0);
     
     applySpringForce = true;
     applyGravity = true;
     gravityVector = new PVector(0,gravityForce);
+    reset();
 
   }
   
@@ -59,6 +56,26 @@ class ArmPart {
   void setApplySpringForce(boolean newVal) {
     applySpringForce = newVal;
   }
+  
+  void reset() {
+    springAxis = new PVector(1,0);
+    if (parent != null) {
+      springAxis = parent.getArmVector();
+    }
+    springAxis.rotate(radians(angleOffParent));
+    PVector initialArmVector = new PVector(springAxis.x, springAxis.y);
+    initialArmVector.mult(armLength);
+    armPrevEnd = new PVector(anchor.x + initialArmVector.x, anchor.y + initialArmVector.y );
+    armNextEnd = new PVector(anchor.x + initialArmVector.x, anchor.y + initialArmVector.y );
+  
+    armVector = new PVector(0,0);
+    armVel = new PVector(0,0);
+    springForceVector = new PVector(0,0);
+    tangentialAccelVector = new PVector(0,0);
+     cycleCount = 0;
+    lastSignOfForce = -2;
+    armVel.set(0,0); // reset arm velocity
+ }
   
   // accel = force / m
   void applyTangentialForce(float force) {
@@ -82,7 +99,12 @@ class ArmPart {
       float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
       // cross prod of 2 2d vecs, cf source of https://chipmunk-physics.net/
       // also see https://stackoverflow.com/questions/243945/calculating-a-2d-vectors-cross-product#:~:text=You%20can't%20do%20a,vectors%20on%20the%20xy%2Dplane.
-      float signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x; 
+      float signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x;
+      //println(lastSignOfForce, signOfForce, cycleCount);
+      if ((lastSignOfForce != -2) && (sign(signOfForce) != sign(lastSignOfForce))) {
+        ++cycleCount;
+      }
+      lastSignOfForce = signOfForce;
       float springForce = signOfForce * k * radians(angleToSpringAxis);
       float springAccel = springForce / mass; // radial acceleration caused by spring
       // spring force acceleration vector is tangential to unit circle at current angle, or, opposite current velocity vector
@@ -105,9 +127,14 @@ class ArmPart {
     
     armNextEnd.set(anchor.x + armVector.x, anchor.y + armVector.y);
     
+    float armVelYCheck = armVel.y;
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
+    
     armPrevEnd.set(armNextEnd);
-    armVel.mult(dampener);
+    float appliedDampener = (cycleCount == requestedCycles ? highDampener : dampener);
+    //println("armVel", armVel, "cycleCount", cycleCount, "appliedDampener",  appliedDampener); 
+    armVel.mult(appliedDampener);
+    
   }
   
   void render() {
