@@ -9,6 +9,7 @@ class ArmPart {
   float highDampener;
   float angleOffParent;
   float pumpForce;
+  int pumpForceInc;
   int armId;
   int cycleCount;
   int requestedCycles;
@@ -74,8 +75,9 @@ class ArmPart {
     armVel = new PVector(0,0);
     springForceVector = new PVector(0,0);
     tangentialAccelVector = new PVector(0,0);
-     cycleCount = 0;
+    cycleCount = 0;
     lastSignOfForce = -2;
+    pumpForceInc = -1;
     armVel.set(0,0); // reset arm velocity
  }
   
@@ -98,9 +100,10 @@ class ArmPart {
  
     boolean pumpTheArm = (cycleCount < requestedCycles);
     
+    float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
+    //println("angleToSpringAxis", angleToSpringAxis);
     if (applySpringForce) {
       //float angleToXAxis = -atan2(armVector.y, armVector.x);
-      float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
       // cross prod of 2 2d vecs, cf source of https://chipmunk-physics.net/
       // also see https://stackoverflow.com/questions/243945/calculating-a-2d-vectors-cross-product#:~:text=You%20can't%20do%20a,vectors%20on%20the%20xy%2Dplane.
       float signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x;
@@ -135,9 +138,17 @@ class ArmPart {
     float armVelYCheck = armVel.y;
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
     if ((sign(armVelYCheck) == -1) && (sign(armVel.y) == 1) && pumpTheArm) {
-      applyTangentialForce(pumpForce);
+      pumpForceInc = 0;
     }
     
+    if (pumpForceInc > -1) {
+      applyTangentialForce(sin(radians(pumpForceInc)) * pumpForce);
+      pumpForceInc+= 30;
+      if (pumpForceInc >= 180) {
+        pumpForceInc = -1;
+      }
+    }
+
     armPrevEnd.set(armNextEnd);
     float appliedDampener = (pumpTheArm ? dampener : highDampener);
     //println("armVel", armVel, "cycleCount", cycleCount, "appliedDampener",  appliedDampener); 

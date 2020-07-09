@@ -1,11 +1,12 @@
 // INITIAL SETTINGS
 int numArmParts = 1;
-float [] ks = {1.5,55,2000};
+float [] ks = {1.5,480,300};
 float [] armLengths = {80,80,70};
-float [] masses = {100,100,2000};
-float [] dampeners = {.999, .99, .99};
+float [] masses = {100,500,1000};
+float [] pumpForces = { 4, 0, 0 };
+float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
-float [] flapForces = {0,2000,2000};
+float [] flapForces = {0,0,0};
 
 ArmPart[] armParts;
 
@@ -21,6 +22,7 @@ float angleBetweenVectors(PVector v1, PVector v2) {
   return degrees(angle);
 }
 
+// https://forum.processing.org/two/discussion/3811/what-is-the-alternative-in-processing
 int sign(float f) {
   if(f==0) return(0);
   return(int(f/abs(f)));
@@ -36,7 +38,7 @@ void flap(float[] forces) {
 void mousePressed() {
   float divisor = 10;
   float pulse = (mouseY / divisor) ;
-  float forceAmts[] = {pulse, pulse, 0};
+  float forceAmts[] = {pulse, 0, 0};
   flap(forceAmts);
 }
 
@@ -51,16 +53,17 @@ void setup() {
                               (i == 0 ? anchor : armParts[i-1].getArmEnd()),
                               armLengths[i],
                               ks[i],
-                              75,
+                              pumpForces[i],
                               dampeners[i],
-                              0.35,
+                              0.90,
                               4,
                               masses[i],
                               angleOffParent[i]);
     armParts[i].setApplySpringForce(true);
     armParts[i].setApplyGravity(false);
   }
-  flap(flapForces);
+  //flap(flapForces);
+
 }
 
 
