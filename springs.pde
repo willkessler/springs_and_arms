@@ -1,6 +1,6 @@
 // INITIAL SETTINGS
 int numArmParts = 1;
-float [] ks = {1.5,480,300};
+float [] ks = {2.5,480,300};
 float [] armLengths = {80,80,70};
 float [] masses = {100,500,1000};
 float [] pumpForces = { 4, 0, 0 };
@@ -55,7 +55,7 @@ void setup() {
                               ks[i],
                               pumpForces[i],
                               dampeners[i],
-                              0.90,
+                              0.8,
                               4,
                               masses[i],
                               angleOffParent[i]);

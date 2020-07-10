@@ -8,7 +8,8 @@ class ArmPart {
   float dampener;
   float highDampener;
   float angleOffParent;
-  float pumpForce;
+  float pumpForce, thisCyclePumpForce;
+  float angleToSpringAxis, signOfForce;
   int pumpForceInc;
   int armId;
   int cycleCount;
@@ -100,13 +101,13 @@ class ArmPart {
  
     boolean pumpTheArm = (cycleCount < requestedCycles);
     
-    float angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
+    angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
     //println("angleToSpringAxis", angleToSpringAxis);
     if (applySpringForce) {
       //float angleToXAxis = -atan2(armVector.y, armVector.x);
       // cross prod of 2 2d vecs, cf source of https://chipmunk-physics.net/
       // also see https://stackoverflow.com/questions/243945/calculating-a-2d-vectors-cross-product#:~:text=You%20can't%20do%20a,vectors%20on%20the%20xy%2Dplane.
-      float signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x;
+      signOfForce = springAxis.x * armVector.y - springAxis.y * armVector.x;
       //println(lastSignOfForce, signOfForce, cycleCount);
       if ((lastSignOfForce != -2) && (sign(signOfForce) != sign(lastSignOfForce))) {
         ++cycleCount;
@@ -139,10 +140,11 @@ class ArmPart {
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
     if ((sign(armVelYCheck) == -1) && (sign(armVel.y) == 1) && pumpTheArm) {
       pumpForceInc = 0;
+      thisCyclePumpForce = random(0.5 * pumpForce, pumpForce);
     }
     
     if (pumpForceInc > -1) {
-      applyTangentialForce(sin(radians(pumpForceInc)) * pumpForce);
+      applyTangentialForce(sin(radians(pumpForceInc)) * thisCyclePumpForce);
       pumpForceInc+= 30;
       if (pumpForceInc >= 180) {
         pumpForceInc = -1;
@@ -160,7 +162,19 @@ class ArmPart {
    // DRAW SPRING-MASS
     rect(anchor.x - 5, anchor.y - 5, 10, 10);
     line(anchor.x, anchor.y, armNextEnd.x, armNextEnd.y);
-    ellipse(armNextEnd.x, armNextEnd.y,10,10);
-  }
+    //ellipse(armNextEnd.x, armNextEnd.y,10,10);
+    
+    PVector sp = new PVector(armNextEnd.x, armNextEnd.y);
+    PVector ap = new PVector(armVector.x, armVector.y);
+    ap.normalize().rotate(radians((angleToSpringAxis * signOfForce+ + 30) * .5)).mult(60);
+    sp.add(ap);
+    line(armNextEnd.x, armNextEnd.y, sp.x, sp.y);
+ 
+    ap.rotate(radians((angleToSpringAxis * signOfForce+ + 20) * .15));
+    PVector hp = new PVector(sp.x, sp.y);
+    hp.add(ap);
+    line(sp.x, sp.y, hp.x,hp.y);
+    
+}
   
 }
