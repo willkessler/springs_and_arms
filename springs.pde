@@ -11,6 +11,7 @@ float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
 float [] flapForces = {0,0,0};
 Slider kValueSlider, massSlider, forearmLenSlider;
+RadioButton armPartChoice;
 
 ArmPart[] armParts;
 
@@ -46,6 +47,47 @@ void keyPressed() {
   flap(forceAmts);
 }
 
+void setupControls() {
+  cp5 = new ControlP5(this);
+  kValueSlider = cp5.addSlider("k-value")
+     .setPosition(50,height - 80)
+     .setSize(300,20)
+     .setRange(0,300)
+     .setValue(ks[1]);
+  massSlider = cp5.addSlider("mass")
+     .setPosition(50,height - 55)
+     .setSize(300,20)
+     .setRange(0,2000)
+     .setValue(200);
+  forearmLenSlider = cp5.addSlider("forearmLength")
+     .setPosition(50,height - 30)
+     .setSize(300,20)
+     .setRange(0,300)
+     .setValue(80);
+  armPartChoice = cp5.addRadioButton("partChoice")
+     .setPosition(50, height - 120)
+     .setSize(40,20)
+     .setColorForeground(color(50))
+     .setColorActive(color(0))
+     .setColorLabel(color(100))
+     .setItemsPerRow(3)
+     .setSpacingColumn(75)
+     .addItem("Shoulder",0)
+     .addItem("Forearm",1)
+     .addItem("Hand",2)
+     ;
+     
+   for(Toggle t:armPartChoice.getItems()) {
+     t.getCaptionLabel().setColorBackground(color(255,80));
+     t.getCaptionLabel().getStyle().moveMargin(-7,0,0,-3);
+     t.getCaptionLabel().getStyle().movePadding(7,0,0,3);
+     t.getCaptionLabel().getStyle().backgroundWidth = 45;
+     t.getCaptionLabel().getStyle().backgroundHeight = 13;
+   }
+   
+   armPartChoice.activate(1);
+}
+
 
 void setup() {
   size(500,500);
@@ -66,25 +108,8 @@ void setup() {
     armParts[i].setApplySpringForce(true);
     armParts[i].setApplyGravity(false);
   }
-  //flap(flapForces);
-
-  cp5 = new ControlP5(this);
-  kValueSlider = cp5.addSlider("k-value")
-     .setPosition(50,height - 80)
-     .setSize(300,20)
-     .setRange(0,300)
-     .setValue(ks[1]);
-  massSlider = cp5.addSlider("mass")
-     .setPosition(50,height - 55)
-     .setSize(300,20)
-     .setRange(0,2000)
-     .setValue(200);
-  forearmLenSlider = cp5.addSlider("forearmLength")
-     .setPosition(50,height - 30)
-     .setSize(300,20)
-     .setRange(0,300)
-     .setValue(80);
-
+  
+  setupControls();
 }
 
 
@@ -98,7 +123,7 @@ void draw() {
   stroke(0);
   
   pushMatrix();
-  translate(width/2,height/2);
+  translate(width/4,height/2);
   int i = 0;
   while (i < numArmParts) {
     armParts[i].update();
@@ -112,8 +137,9 @@ void draw() {
   text("mass:", 10, height - 40);
   text("faLen:",10, height - 15);
   
-  armParts[1].setKVal(kValueSlider.getValue());
-  armParts[1].setMass(massSlider.getValue());
-  armParts[1].setLength(forearmLenSlider.getValue());
+  int whichArmPart = (int) armPartChoice.getValue();
+  armParts[whichArmPart].setKVal(kValueSlider.getValue()); //<>//
+  armParts[whichArmPart].setMass(massSlider.getValue());
+  armParts[whichArmPart].setLength(forearmLenSlider.getValue());
  
 };
