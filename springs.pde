@@ -1,12 +1,16 @@
+import controlP5.*;
+ControlP5 cp5;
+
 // INITIAL SETTINGS
-int numArmParts = 1;
-float [] ks = {2.5,480,300};
-float [] armLengths = {80,80,70};
-float [] masses = {100,500,1000};
-float [] pumpForces = { 4, 0, 0 };
+int numArmParts = 2;
+float [] ks = {2.5,10,300};
+float [] armLengths = {50,80,70};
+float [] masses = {100,200,1000};
+float [] pumpForces = { 4, 4, 0 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
 float [] flapForces = {0,0,0};
+Slider kValueSlider, massSlider, forearmLenSlider;
 
 ArmPart[] armParts;
 
@@ -35,16 +39,16 @@ void flap(float[] forces) {
   }
 }
 
-void mousePressed() {
+void keyPressed() {
   float divisor = 10;
   float pulse = (mouseY / divisor) ;
-  float forceAmts[] = {pulse, 0, 0};
+  float forceAmts[] = {pulse, pulse * .75, 0};
   flap(forceAmts);
 }
 
 
 void setup() {
-  size(1000,500);
+  size(500,500);
   PVector anchor = new PVector(0,0);
   armParts = new ArmPart[numArmParts];
   for (int i = 0; i < numArmParts; ++i) {
@@ -63,6 +67,23 @@ void setup() {
     armParts[i].setApplyGravity(false);
   }
   //flap(flapForces);
+
+  cp5 = new ControlP5(this);
+  kValueSlider = cp5.addSlider("k-value")
+     .setPosition(50,height - 80)
+     .setSize(300,20)
+     .setRange(0,300)
+     .setValue(ks[1]);
+  massSlider = cp5.addSlider("mass")
+     .setPosition(50,height - 55)
+     .setSize(300,20)
+     .setRange(0,2000)
+     .setValue(200);
+  forearmLenSlider = cp5.addSlider("forearmLength")
+     .setPosition(50,height - 30)
+     .setSize(300,20)
+     .setRange(0,300)
+     .setValue(80);
 
 }
 
@@ -86,4 +107,13 @@ void draw() {
   }
   popMatrix();
   
+  fill(0);
+  text("kVal:", 10, height - 65);
+  text("mass:", 10, height - 40);
+  text("faLen:",10, height - 15);
+  
+  armParts[1].setKVal(kValueSlider.getValue());
+  armParts[1].setMass(massSlider.getValue());
+  armParts[1].setLength(forearmLenSlider.getValue());
+ 
 };

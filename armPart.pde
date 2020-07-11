@@ -19,6 +19,8 @@ class ArmPart {
   boolean applySpringForce;
   boolean applyGravity;
   float gravityForce = .005;
+  ArrayList<Float> angleToSpringAxisHistory;
+  int historyTrailer;
   
   ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float pf, float dampenerVal, float highDampenerVal, 
           int requestedCyclesVal, float m, float angleOffParentVal ) {
@@ -39,8 +41,22 @@ class ArmPart {
     applySpringForce = true;
     applyGravity = true;
     gravityVector = new PVector(0,gravityForce);
+    angleToSpringAxisHistory = new ArrayList<Float>();
+    historyTrailer = -50;
     reset();
 
+  }
+  
+  void setKVal(float newVal) { //<>//
+    k = newVal;
+  }
+  
+  void setMass(float newVal) {
+    mass = newVal;
+  }
+  
+  void setLength(float newVal) {
+   armLength = newVal;
   }
   
   PVector getArmEnd() {
@@ -80,6 +96,7 @@ class ArmPart {
     lastSignOfForce = -2;
     pumpForceInc = -1;
     armVel.set(0,0); // reset arm velocity
+    angleToSpringAxisHistory.clear();
  }
   
   // accel = force / m
@@ -156,6 +173,9 @@ class ArmPart {
     //println("armVel", armVel, "cycleCount", cycleCount, "appliedDampener",  appliedDampener); 
     armVel.mult(appliedDampener);
     
+    if (pumpTheArm) {
+      angleToSpringAxisHistory.add(angleToSpringAxis);
+    }
   }
   
   void render() {
@@ -166,14 +186,28 @@ class ArmPart {
     
     PVector sp = new PVector(armNextEnd.x, armNextEnd.y);
     PVector ap = new PVector(armVector.x, armVector.y);
-    ap.normalize().rotate(radians((angleToSpringAxis * signOfForce+ + 30) * .5)).mult(60);
-    sp.add(ap);
-    line(armNextEnd.x, armNextEnd.y, sp.x, sp.y);
+    
+    //int historyPointer = 0;
+    //historyTrailer++;
+    //if (historyTrailer > -1) {
+    //  historyPointer = historyTrailer;
+    //}
+    //float thisAngle = angleToSpringAxisHistory.get(historyPointer);
+    //println(thisAngle);
+
+
+    //float correctedAngle = angleToSpringAxis * signOfForce;
+    //float forearmAngle = ((correctedAngle) - 5) * .75;
+    //println(correctedAngle, forearmAngle);
+    //ap.normalize().rotate(radians(forearmAngle)).mult(60);
+    //sp.add(ap);
+    //line(armNextEnd.x, armNextEnd.y, sp.x, sp.y);
  
-    ap.rotate(radians((angleToSpringAxis * signOfForce+ + 20) * .15));
-    PVector hp = new PVector(sp.x, sp.y);
-    hp.add(ap);
-    line(sp.x, sp.y, hp.x,hp.y);
+    //ap.rotate(radians((angleToSpringAxis * signOfForce - 20) * .5));
+    //PVector hp = new PVector(sp.x, sp.y);
+    //hp.add(ap);
+    //line(sp.x, sp.y, hp.x,hp.y);
+    
     
 }
   
