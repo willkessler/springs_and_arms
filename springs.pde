@@ -2,7 +2,7 @@ import controlP5.*;
 ControlP5 cp5;
 
 // INITIAL SETTINGS
-int numArmParts = 2;
+int numArmParts = 3;
 float [] ks = {2.5,10,300};
 float [] armLengths = {50,80,70};
 float [] masses = {100,200,1000};
@@ -69,17 +69,15 @@ void setupControls() {
      .setSize(300,20)
      .setRange(0,300)
      .setValue(armLengths[i]);
-    //cp5.getController("k-value-" + i).getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
-    //cp5.getController("mass-" + i).getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
-    //cp5.getController("forearmLength-" + i).getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
   }
-  continuousPulseCheckbox = cp5.addCheckBox("checkBox")
-                .setPosition(50, 200)
+  continuousPulseCheckbox = cp5.addCheckBox("Pulse")
+                .setPosition(50, 50)
                 .setSize(10, 10)
                 .setItemsPerRow(1)
                 .setSpacingColumn(30)
                 .setSpacingRow(20)
-                .addItem("pulse", 1)
+                .addItem("Continous Pulse", 1)
+                .setColorLabel(50)
                 ;
   continuousPulseCheckbox.getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
 }
@@ -140,5 +138,5 @@ void draw() {
     armParts[i].setLength(forearmLenSliders[i].getValue());
     i++;
   }
-   
+  //text("Continuous pulse", 65,60); 
 };
