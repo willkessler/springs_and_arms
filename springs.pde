@@ -10,8 +10,8 @@ float [] pumpForces = { 4, 4, 0 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
 float [] flapForces = {0,0,0};
-Slider kValueSlider, massSlider, forearmLenSlider;
-RadioButton armPartChoice;
+Slider [] kValueSliders, massSliders, forearmLenSliders;
+Slider pulseStrengthSlider;
 
 ArmPart[] armParts;
 
@@ -49,8 +49,9 @@ void keyPressed() {
 
 void setupControls() {
   cp5 = new ControlP5(this);
-  kValueSlider = cp5.addSlider("k-value")
-     .setPosition(50,height - 80)
+  for (int i = 0; i < numArmParts; ++i) {
+    kValueSliders[i] = cp5.addSlider("k-value" + i)
+     .setPosition(50,height - (80 * i))
      .setSize(300,20)
      .setRange(0,300)
      .setValue(ks[1]);
