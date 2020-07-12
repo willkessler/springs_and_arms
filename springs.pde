@@ -12,6 +12,7 @@ float [] angleOffParent = {-35, 35, 25 };
 float [] flapForces = {0,0,0};
 Slider [] kValueSliders, massSliders, forearmLenSliders;
 Slider pulseStrengthSlider;
+CheckBox continuousPulseCheckbox;
 
 ArmPart[] armParts;
 
@@ -49,49 +50,43 @@ void keyPressed() {
 
 void setupControls() {
   cp5 = new ControlP5(this);
+  kValueSliders = new Slider[numArmParts];
+  massSliders = new Slider[numArmParts];
+  forearmLenSliders = new Slider[numArmParts];
   for (int i = 0; i < numArmParts; ++i) {
-    kValueSliders[i] = cp5.addSlider("k-value" + i)
-     .setPosition(50,height - (80 * i))
+    kValueSliders[i] = cp5.addSlider("k-value-" + i)
+     .setPosition(70,height - ((100 * i) + 75))
      .setSize(300,20)
      .setRange(0,300)
-     .setValue(ks[1]);
-  massSlider = cp5.addSlider("mass")
-     .setPosition(50,height - 55)
+     .setValue(ks[i]);
+    massSliders[i] = cp5.addSlider("mass-" + i)
+     .setPosition(70,height - ((100 * i) + 50))
      .setSize(300,20)
      .setRange(0,2000)
-     .setValue(200);
-  forearmLenSlider = cp5.addSlider("forearmLength")
-     .setPosition(50,height - 30)
+     .setValue(masses[i]);
+   forearmLenSliders[i] = cp5.addSlider("forearmLength-" + i)
+     .setPosition(70,height - ((100 * i) + 25))
      .setSize(300,20)
      .setRange(0,300)
-     .setValue(80);
-  armPartChoice = cp5.addRadioButton("partChoice")
-     .setPosition(50, height - 120)
-     .setSize(40,20)
-     .setColorForeground(color(50))
-     .setColorActive(color(0))
-     .setColorLabel(color(100))
-     .setItemsPerRow(3)
-     .setSpacingColumn(75)
-     .addItem("Shoulder",0)
-     .addItem("Forearm",1)
-     .addItem("Hand",2)
-     ;
-     
-   for(Toggle t:armPartChoice.getItems()) {
-     t.getCaptionLabel().setColorBackground(color(255,80));
-     t.getCaptionLabel().getStyle().moveMargin(-7,0,0,-3);
-     t.getCaptionLabel().getStyle().movePadding(7,0,0,3);
-     t.getCaptionLabel().getStyle().backgroundWidth = 45;
-     t.getCaptionLabel().getStyle().backgroundHeight = 13;
-   }
-   
-   armPartChoice.activate(1);
+     .setValue(armLengths[i]);
+    //cp5.getController("k-value-" + i).getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
+    //cp5.getController("mass-" + i).getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
+    //cp5.getController("forearmLength-" + i).getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
+  }
+  continuousPulseCheckbox = cp5.addCheckBox("checkBox")
+                .setPosition(50, 200)
+                .setSize(10, 10)
+                .setItemsPerRow(1)
+                .setSpacingColumn(30)
+                .setSpacingRow(20)
+                .addItem("pulse", 1)
+                ;
+  continuousPulseCheckbox.getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
 }
 
 
 void setup() {
-  size(500,500);
+  size(1000,500);
   PVector anchor = new PVector(0,0);
   armParts = new ArmPart[numArmParts];
   for (int i = 0; i < numArmParts; ++i) {
@@ -124,7 +119,7 @@ void draw() {
   stroke(0);
   
   pushMatrix();
-  translate(width/4,height/2);
+  translate(width/2,height/2);
   int i = 0;
   while (i < numArmParts) {
     armParts[i].update();
@@ -134,13 +129,16 @@ void draw() {
   popMatrix();
   
   fill(0);
-  text("kVal:", 10, height - 65);
-  text("mass:", 10, height - 40);
-  text("faLen:",10, height - 15);
   
-  int whichArmPart = (int) armPartChoice.getValue();
-  armParts[whichArmPart].setKVal(kValueSlider.getValue()); //<>//
-  armParts[whichArmPart].setMass(massSlider.getValue());
-  armParts[whichArmPart].setLength(forearmLenSlider.getValue());
- 
+  i = 0;
+  while (i < numArmParts) {
+    text("kVal-" + i + ":",  10, height - ((100 * i) + 60));
+    text("mass-" + i + ":",  10, height - ((100 * i) + 35));
+    text("length-" + i + ":", 10, height - ((100 * i) + 10));
+    armParts[i].setKVal(kValueSliders[i].getValue()); //<>//
+    armParts[i].setMass(massSliders[i].getValue());
+    armParts[i].setLength(forearmLenSliders[i].getValue());
+    i++;
+  }
+   
 };
