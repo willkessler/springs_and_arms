@@ -116,7 +116,7 @@ class ArmPart {
     armNextEnd.add(armVel);
     armVector = getArmVector();
  
-    boolean pumpTheArm = (cycleCount < requestedCycles);
+    boolean pumpTheArm = (cycleCount < requestedCycles) || continuousPulse;
     
     angleToSpringAxis = angleBetweenVectors(springAxis, armVector);
     //println("angleToSpringAxis", angleToSpringAxis);

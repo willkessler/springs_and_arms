@@ -13,6 +13,7 @@ float [] flapForces = {0,0,0};
 Slider [] kValueSliders, massSliders, forearmLenSliders;
 Slider pulseStrengthSlider;
 CheckBox continuousPulseCheckbox;
+boolean continuousPulse;
 
 ArmPart[] armParts;
 
@@ -42,10 +43,12 @@ void flap(float[] forces) {
 }
 
 void keyPressed() {
-  float divisor = 10;
-  float pulse = (mouseY / divisor) ;
-  float forceAmts[] = {pulse, pulse * .75, 0};
-  flap(forceAmts);
+  if (key == ' ') {
+    float divisor = 10;
+    float pulse = (mouseY / divisor) ;
+    float forceAmts[] = {pulse, pulse * .75, 0};
+    flap(forceAmts);
+  }
 }
 
 void setupControls() {
@@ -87,6 +90,7 @@ void setup() {
   size(1000,500);
   PVector anchor = new PVector(0,0);
   armParts = new ArmPart[numArmParts];
+  continuousPulse = false;
   for (int i = 0; i < numArmParts; ++i) {
     armParts[i] = new ArmPart(i, 
                               (i == 0 ? null : armParts[i-1]),
@@ -128,15 +132,17 @@ void draw() {
   
   fill(0);
   
-  i = 0;
-  while (i < numArmParts) {
-    text("kVal-" + i + ":",  10, height - ((100 * i) + 60));
-    text("mass-" + i + ":",  10, height - ((100 * i) + 35));
-    text("length-" + i + ":", 10, height - ((100 * i) + 10));
-    armParts[i].setKVal(kValueSliders[i].getValue()); //<>//
-    armParts[i].setMass(massSliders[i].getValue());
-    armParts[i].setLength(forearmLenSliders[i].getValue());
-    i++;
+  i = numArmParts - 1;
+  int j;
+  while (i > -1) {
+    j = numArmParts - i - 1;
+    text("kVal-" + j + ":",  10, height - ((100 * j) + 60));
+    text("mass-" + j + ":",  10, height - ((100 * j) + 35));
+    text("length-" + j + ":", 10, height - ((100 * j) + 10));
+    armParts[i].setKVal(kValueSliders[j].getValue()); //<>//
+    armParts[i].setMass(massSliders[j].getValue());
+    armParts[i].setLength(forearmLenSliders[j].getValue());
+    i--;
   }
-  //text("Continuous pulse", 65,60); 
+  continuousPulse = continuousPulseCheckbox.getState(0);
 };
