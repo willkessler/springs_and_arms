@@ -77,6 +77,10 @@ class ArmPart {
     applySpringForce = newVal;
   }
   
+  void setPumpForce(float pf) {
+    pumpForce = pf;
+  }
+  
   void reset() {
     springAxis = new PVector(1,0);
     if (parent != null) {
@@ -157,9 +161,14 @@ class ArmPart {
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
     if ((sign(armVelYCheck) == -1) && (sign(armVel.y) == 1) && pumpTheArm) {
       pumpForceInc = 0;
-      thisCyclePumpForce = random(0.5 * pumpForce, pumpForce);
+      //thisCyclePumpForce = random(0.5 * pumpForce, pumpForce);
+      thisCyclePumpForce = pumpForce;
     }
     
+    if (armId == 2) {
+        println("thisCyclePumpForce", thisCyclePumpForce);
+      }
+  
     if (pumpForceInc > -1) {
       applyTangentialForce(sin(radians(pumpForceInc)) * thisCyclePumpForce);
       pumpForceInc+= 30;
