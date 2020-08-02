@@ -2,7 +2,7 @@ class ArmPart {
   PVector anchor, armPrevEnd, armNextEnd, parentArmEnd;
   PVector armVector, armVel, springAxis, springForceVector, tangentialAccelVector;
   PVector gravityVector;
-  float armLength;
+  float armLength, armWidth;
   float mass;
   float k;
   float dampener;
@@ -21,13 +21,15 @@ class ArmPart {
   float gravityForce = .005;
   ArrayList<Float> angleToSpringAxisHistory;
   int historyTrailer;
+  float LIFT_COEFFICIENT = 1.0;
   
-  ArmPart(int id, ArmPart p, PVector anc, float al, float kVal, float pf, float dampenerVal, float highDampenerVal, 
+  ArmPart(int id, ArmPart p, PVector anc, float al, float aw, float kVal, float pf, float dampenerVal, float highDampenerVal, 
           int requestedCyclesVal, float m, float angleOffParentVal ) {
     parent = p;
     mass = m;
     k = kVal;
     armLength = al;
+    armWidth = aw;
     dampener = dampenerVal;
     highDampener = highDampenerVal;
     pumpForce = pf;
@@ -41,7 +43,7 @@ class ArmPart {
     applySpringForce = true;
     applyGravity = true;
     gravityVector = new PVector(0,gravityForce);
-    angleToSpringAxisHistory = new ArrayList<Float>();
+    //angleToSpringAxisHistory = new ArrayList<Float>();
     historyTrailer = -50;
     reset();
 
@@ -81,6 +83,15 @@ class ArmPart {
     pumpForce = pf;
   }
   
+  // lift = lift_coefficient * wing area * sin(wing_angle_from_joint)
+  float compute_lift() {
+    PVector xAxis = new PVector(1,0);
+    float angleToXAxis = angleBetweenVectors(xAxis, armVector);
+    float area = armLength * armWidth;
+    float lift = LIFT_COEFFICIENT * area * cos(radians(angleToXAxis));
+    return lift;
+  }
+    
   void reset() {
     springAxis = new PVector(1,0);
     if (parent != null) {
@@ -100,7 +111,7 @@ class ArmPart {
     lastSignOfForce = -2;
     pumpForceInc = -1;
     armVel.set(0,0); // reset arm velocity
-    angleToSpringAxisHistory.clear();
+    //angleToSpringAxisHistory.clear();
  }
   
   // accel = force / m
@@ -165,10 +176,6 @@ class ArmPart {
       thisCyclePumpForce = pumpForce;
     }
     
-    if (armId == 2) {
-        println("thisCyclePumpForce", thisCyclePumpForce);
-      }
-  
     if (pumpForceInc > -1) {
       applyTangentialForce(sin(radians(pumpForceInc)) * thisCyclePumpForce);
       pumpForceInc+= 30;
@@ -182,9 +189,15 @@ class ArmPart {
     //println("armVel", armVel, "cycleCount", cycleCount, "appliedDampener",  appliedDampener); 
     armVel.mult(appliedDampener);
     
-    if (pumpTheArm) {
-      angleToSpringAxisHistory.add(angleToSpringAxis);
+    //if (pumpTheArm) {
+    //  angleToSpringAxisHistory.add(angleToSpringAxis);
+    //}
+    
+    if (armId == 0) {
+      println("lift:", compute_lift());
     }
+  
+    
   }
   
   void render() {

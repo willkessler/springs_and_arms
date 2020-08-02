@@ -1,3 +1,9 @@
+// TODO
+// Calculate lift and drag forces for each wing section
+// Varying the pump start time
+// Make the pump force use a bump wave fn and vary its amplitude and peak position
+
+
 import controlP5.*;
 ControlP5 cp5;
 
@@ -5,6 +11,7 @@ ControlP5 cp5;
 int numArmParts = 3;
 float [] ks = {18,13,10};
 float [] armLengths = {50,110,70};
+float [] armWidths = {10,8,4};
 float [] masses = {486.66,593.33,1000};
 float [] pumpForces = { 34.33, 4, 0.83 };
 float [] dampeners = {.999, .999, .999};
@@ -107,6 +114,7 @@ void setup() {
                               (i == 0 ? null : armParts[i-1]),
                               (i == 0 ? anchor : armParts[i-1].getArmEnd()),
                               armLengths[i],
+                              armWidths[i],
                               ks[i],
                               pumpForces[i],
                               dampeners[i],
