@@ -9,14 +9,13 @@ ControlP5 cp5;
 
 // INITIAL SETTINGS
 int numArmParts = 3;
-float [] ks = {18,13,10};
+float [] ks = {6,13,20};
 float [] armLengths = {50,110,70};
 float [] armWidths = {10,8,4};
 float [] masses = {486.66,593.33,1000};
-float [] pumpForces = { 34.33, 4, 0.83 };
+float [] pumpForces = { 4.33, 4, 0.83 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
-float [] flapForces = {0,0,0};
 Slider [] kValueSliders, massSliders, forearmLenSliders, pumpSliders;
 Slider pulseStrengthSlider;
 Toggle continuousPulseToggle;
@@ -78,22 +77,22 @@ void setupControls() {
      .setPosition(10,height - ((100 * i) + 100))
      .setSize(300,20)
      .setRange(0,300)
-     .setValue(ks[i]);
+     .setValue(ks[j]);
     massSliders[i] = cp5.addSlider("mass-"  + j)
      .setPosition(10,height - ((100 * i) + 75))
      .setSize(300,20)
      .setRange(0,2000)
-     .setValue(masses[i]);
+     .setValue(masses[j]);
    forearmLenSliders[i] = cp5.addSlider("forearmLength-" + j)
      .setPosition(10,height - ((100 * i) + 50))
      .setSize(300,20)
      .setRange(0,300)
-     .setValue(armLengths[i]);
+     .setValue(armLengths[j]);
     pumpSliders[i] = cp5.addSlider("pumpSlider-" + j)
      .setPosition(10,height - ((100 * i) + 25))
      .setSize(300,20)
      .setRange(0,50)
-     .setValue(pumpForces[i]);
+     .setValue(pumpForces[j]);
   }
   // https://www.kasperkamperman.com/blog/processing-code/controlp5-library-example1/
   // parameters : name, default value (boolean), x, y, width, height
@@ -152,6 +151,9 @@ void draw() {
   
   fill(0);
   int j;
+  float [] lifts = new float[numArmParts];
+  float totalLift = 0;
+
   for (i = 0; i < numArmParts; ++i) {
     j = numArmParts - i - 1;
     /*text("kVal-" + j + ":",  10, height - ((100 * j) + 85));
@@ -162,7 +164,10 @@ void draw() {
     armParts[i].setMass(massSliders[j].getValue());
     armParts[i].setLength(forearmLenSliders[j].getValue());
     armParts[i].setPumpForce(pumpSliders[j].getValue());   
+    lifts[i] = armParts[i].computeLift();
+    totalLift += lifts[i];
   }
   continuousPulse = continuousPulseToggle.getState();
+  println("lift", lifts[0], lifts[1], lifts[2], totalLift);
   
 };

@@ -84,7 +84,7 @@ class ArmPart {
   }
   
   // lift = lift_coefficient * wing area * sin(wing_angle_from_joint)
-  float compute_lift() {
+  float computeLift() {
     PVector xAxis = new PVector(1,0);
     float angleToXAxis = angleBetweenVectors(xAxis, armVector);
     float area = armLength * armWidth;
@@ -192,11 +192,6 @@ class ArmPart {
     //if (pumpTheArm) {
     //  angleToSpringAxisHistory.add(angleToSpringAxis);
     //}
-    
-    if (armId == 0) {
-      println("lift:", compute_lift());
-    }
-  
     
   }
   
