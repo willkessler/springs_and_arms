@@ -9,11 +9,11 @@ ControlP5 cp5;
 
 // INITIAL SETTINGS
 int numArmParts = 3;
-float [] ks = {6,13,20};
-float [] armLengths = {50,110,70};
+float [] ks = {6,9,25};
+float [] armLengths = {85,134,70};
 float [] armWidths = {10,8,4};
 float [] masses = {486.66,593.33,1000};
-float [] pumpForces = { 4.33, 4, 0.83 };
+float [] pumpForces = { 10, 4, 0.83 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
 Slider [] kValueSliders, massSliders, forearmLenSliders, pumpSliders;
@@ -153,6 +153,7 @@ void draw() {
   int j;
   float [] lifts = new float[numArmParts];
   float totalLift = 0;
+  int liftDisplayX = 200;
 
   for (i = 0; i < numArmParts; ++i) {
     j = numArmParts - i - 1;
@@ -166,8 +167,12 @@ void draw() {
     armParts[i].setPumpForce(pumpSliders[j].getValue());   
     lifts[i] = armParts[i].computeLift();
     totalLift += lifts[i];
+    text(round(lifts[i]), width - liftDisplayX + ((i + 1) * 40), height - 10);
   }
   continuousPulse = continuousPulseToggle.getState();
+  text("Lift:", width - liftDisplayX - 25, height - 10);
+  text(round(totalLift), width - liftDisplayX, height - 10);
+
   println("lift", lifts[0], lifts[1], lifts[2], totalLift);
   
 };
