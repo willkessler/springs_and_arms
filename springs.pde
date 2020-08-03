@@ -1,7 +1,7 @@
 // TODO
-// Calculate lift and drag forces for each wing section
-// Varying the pump start time
-// Make the pump force use a bump wave fn and vary its amplitude and peak position
+// X Calculate lift and drag forces for each wing section and display them
+// Make the pump force use a bump wave fn and vary its amplitude and peak position to optimize lift
+// Vary the pump start time
 
 
 import controlP5.*;
