@@ -1,4 +1,4 @@
-// TODO
+  // TODO
 // X Calculate lift and drag forces for each wing section and display them
 // Make the pump force use a bump wave fn and vary its amplitude and peak position to optimize lift
 // Vary the pump start time
@@ -16,6 +16,11 @@ float [] masses = {486.66,593.33,1000};
 float [] pumpForces = { 10, 4, 0.83 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
+float [] lifts = new float[numArmParts];
+float [] totalLiftHistory;
+int liftGraphWidth;
+int liftGraphHeight = 50;
+int liftGraphBarIndex = 0;
 Slider [] kValueSliders, massSliders, forearmLenSliders, pumpSliders;
 Slider pulseStrengthSlider;
 Toggle continuousPulseToggle;
@@ -61,6 +66,9 @@ void keyPressed() {
     float pulse = (mouseY / divisor) ;
     float forceAmts[] = {pulse, pulse * .75, 0};
     flap(forceAmts);
+  } else if (key == 'r') {
+    println("Reset!");
+    reset();
   }
 }
 
@@ -102,9 +110,9 @@ void setupControls() {
   continuousPulseToggle.getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(10);
 }
 
-
-void setup() {
-  size(1000,500);
+void reset() {
+  liftGraphWidth = (int) (width / 3.0);
+  totalLiftHistory = new float[liftGraphWidth]; //<>//
   PVector anchor = new PVector(0,0);
   armParts = new ArmPart[numArmParts];
   continuousPulse = true;
@@ -130,6 +138,46 @@ void setup() {
 }
 
 
+void setup() {
+  size(1000,500);
+
+  reset();
+}
+
+void renderLiftGraph() {
+  float totalLift = 0;
+  int liftDisplayX = 200;
+
+  for (int i = 0; i < numArmParts; ++i) {
+    lifts[i] = armParts[i].computeLift();
+    totalLift += lifts[i];
+  }
+  stroke(0);
+  noFill();
+  rect(width-liftGraphWidth, height-liftGraphHeight, liftGraphWidth, liftGraphHeight);
+  
+  stroke(255,0,0);
+  float totalLiftHistoryScaled;
+  for (int i = 0; i < liftGraphBarIndex; ++i) {
+    totalLiftHistoryScaled = (totalLiftHistory[i] / 3000) * liftGraphHeight;
+    rect(width-liftGraphWidth+i, height - totalLiftHistoryScaled, 1, height);
+  }
+  
+  stroke(255);
+  text("Lift:", width - liftDisplayX - 45, height - 10);
+  textSize(16);
+  text(round(totalLift), width - liftDisplayX - 20, height - 10);
+  totalLiftHistory[liftGraphBarIndex] = totalLift;
+  liftGraphBarIndex = (liftGraphBarIndex + 1 == liftGraphWidth ? 0 : liftGraphBarIndex + 1);
+  textSize(12);
+  
+  for (int i = 0; i < numArmParts; ++i) {
+    text(round(lifts[i]), width - liftDisplayX + ((i + 1) * 40), height - 10);
+  } 
+
+  
+}
+
 // DRAW FUNCTION
 void draw() {
                     
@@ -151,9 +199,6 @@ void draw() {
   
   fill(0);
   int j;
-  float [] lifts = new float[numArmParts];
-  float totalLift = 0;
-  int liftDisplayX = 200;
 
   for (i = 0; i < numArmParts; ++i) {
     j = numArmParts - i - 1;
@@ -165,14 +210,10 @@ void draw() {
     armParts[i].setMass(massSliders[j].getValue());
     armParts[i].setLength(forearmLenSliders[j].getValue());
     armParts[i].setPumpForce(pumpSliders[j].getValue());   
-    lifts[i] = armParts[i].computeLift();
-    totalLift += lifts[i];
-    text(round(lifts[i]), width - liftDisplayX + ((i + 1) * 40), height - 10);
   }
   continuousPulse = continuousPulseToggle.getState();
-  text("Lift:", width - liftDisplayX - 25, height - 10);
-  text(round(totalLift), width - liftDisplayX, height - 10);
+  renderLiftGraph();
 
-  println("lift", lifts[0], lifts[1], lifts[2], totalLift);
+  //println("lift", lifts[0], lifts[1], lifts[2], totalLift);
   
 };
