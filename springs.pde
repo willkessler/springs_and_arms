@@ -164,15 +164,15 @@ void renderLiftGraph() {
   }
   
   stroke(255);
-  text("Lift:", width - liftDisplayX - 45, height - 10);
+  text("Lift:", width - liftDisplayX - 45, height - liftGraphHeight);
   textSize(16);
-  text(round(totalLift), width - liftDisplayX - 20, height - 10);
+  text(round(totalLift), width - liftDisplayX - 20, height - liftGraphHeight);
   totalLiftHistory[liftGraphBarIndex] = totalLift;
   liftGraphBarIndex = (liftGraphBarIndex + 1 == liftGraphWidth ? 0 : liftGraphBarIndex + 1);
   textSize(12);
   
   for (int i = 0; i < numArmParts; ++i) {
-    text(round(lifts[i]), width - liftDisplayX + ((i + 1) * 40), height - 10);
+    text(round(lifts[i]), width - liftDisplayX + ((i + 1) * 40), height - liftGraphHeight);
   } 
 
   

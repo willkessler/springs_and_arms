@@ -88,7 +88,8 @@ class ArmPart {
     PVector xAxis = new PVector(1,0);
     float angleToXAxis = angleBetweenVectors(xAxis, armVector);
     float area = armLength * armWidth;
-    float lift = LIFT_COEFFICIENT * area * cos(radians(angleToXAxis));
+    float armMovingDown = (armVector.y > 0) ? 1 : 0;
+    float lift = LIFT_COEFFICIENT * area * cos(radians(angleToXAxis)) * armMovingDown; 
     return lift;
   }
     
@@ -170,7 +171,7 @@ class ArmPart {
     
     float armVelYCheck = armVel.y;
     armVel.set(armNextEnd.x - armPrevEnd.x, armNextEnd.y - armPrevEnd.y);
-    if ((sign(armVelYCheck) == -1) && (sign(armVel.y) == 1) && pumpTheArm) {
+    if ((sign(armVelYCheck) == -1) && (sign(armVel.y) == 1) && pumpTheArm) { // begin pump cycle at the top of the wing beat.
       pumpForceInc = 0;
       //thisCyclePumpForce = random(0.5 * pumpForce, pumpForce);
       thisCyclePumpForce = pumpForce;
