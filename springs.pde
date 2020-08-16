@@ -9,10 +9,10 @@ ControlP5 cp5;
 
 // INITIAL SETTINGS
 int numArmParts = 3;
-float [] ks = {6,9,25};
+float [] ks = {6,8.5,34};
 float [] armLengths = {85,134,70};
 float [] armWidths = {10,8,4};
-float [] masses = {486.66,593.33,1000};
+float [] masses = {486.66,586,1373};
 float [] pumpForces = { 10, 4, 0.83 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
@@ -96,7 +96,7 @@ void setupControls() {
      .setSize(300,20)
      .setRange(0,300)
      .setValue(armLengths[j]);
-    pumpSliders[i] = cp5.addSlider("pumpSlider-" + j)
+    pumpSliders[i] = cp5.addSlider("pumpForce-" + j)
      .setPosition(10,height - ((100 * i) + 25))
      .setSize(300,20)
      .setRange(0,50)
@@ -157,11 +157,6 @@ void renderLiftGraph() {
   rect(width-liftGraphWidth, height-liftGraphHeight, liftGraphWidth, liftGraphHeight);
   
   stroke(255,0,0);
-  float totalLiftHistoryScaled;
-  for (int i = 0; i < liftGraphBarIndex; ++i) {
-    totalLiftHistoryScaled = (totalLiftHistory[i] / 3000) * liftGraphHeight;
-    rect(width-liftGraphWidth+i, height - totalLiftHistoryScaled, 1, height);
-  }
   
   stroke(255);
   text("Lift:", width - liftDisplayX - 45, height - liftGraphHeight);
@@ -169,6 +164,13 @@ void renderLiftGraph() {
   text(round(totalLift), width - liftDisplayX - 20, height - liftGraphHeight);
   totalLiftHistory[liftGraphBarIndex] = totalLift;
   liftGraphBarIndex = (liftGraphBarIndex + 1 == liftGraphWidth ? 0 : liftGraphBarIndex + 1);
+
+  float totalLiftHistoryScaled;
+  for (int i = 0; i < liftGraphBarIndex; ++i) {
+    totalLiftHistoryScaled = (totalLiftHistory[i] / 2000) * liftGraphHeight;
+    rect(width-liftGraphWidth+i, height - totalLiftHistoryScaled, 1, totalLiftHistoryScaled);
+  }
+  
   textSize(12);
   
   for (int i = 0; i < numArmParts; ++i) {

@@ -86,10 +86,13 @@ class ArmPart {
   // lift = lift_coefficient * wing area * sin(wing_angle_from_joint)
   float computeLift() {
     PVector xAxis = new PVector(1,0);
-    float angleToXAxis = angleBetweenVectors(xAxis, armVector);
+    PVector armVec = getArmVector();
+    float angleToXAxis = angleBetweenVectors(xAxis, armVec);
     float area = armLength * armWidth;
-    float armMovingDown = (armVector.y > 0) ? 1 : 0;
-    float lift = LIFT_COEFFICIENT * area * cos(radians(angleToXAxis)) * armMovingDown; 
+    float armMovingDown = (armVel.y > 0) ? 1 : 0;
+    float cosAngleToXaxis = cos(radians(angleToXAxis));
+    float lift = LIFT_COEFFICIENT * area * cosAngleToXaxis * armMovingDown; 
+    //println(armVec, angleToXAxis, cosAngleToXaxis, lift);
     return lift;
   }
     
@@ -178,7 +181,8 @@ class ArmPart {
     }
     
     if (pumpForceInc > -1) {
-      applyTangentialForce(sin(radians(pumpForceInc)) * thisCyclePumpForce);
+      // ramp up the force along a sin wave graph (ease-in then ease-out) up to Pi radians
+      applyTangentialForce(sin(radians(pumpForceInc)) * thisCyclePumpForce); 
       pumpForceInc+= 30;
       if (pumpForceInc >= 180) {
         pumpForceInc = -1;
