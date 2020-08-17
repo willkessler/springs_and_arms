@@ -13,7 +13,8 @@ float [] ks = {6,8.5,34};
 float [] armLengths = {85,134,70};
 float [] armWidths = {10,8,4};
 float [] masses = {486.66,586,1373};
-float [] pumpForces = { 10, 4, 0.83 };
+//float [] pumpForces = { 10, 4, 0.83 };
+float [] pumpForces = { 5, 1, 0.05 };
 float [] dampeners = {.999, .999, .999};
 float [] angleOffParent = {-35, 35, 25 };
 float [] lifts = new float[numArmParts];
@@ -49,7 +50,8 @@ int sign(float f) {
 void flap(float[] forces) {
   for (int i = 0; i < numArmParts; ++i) {
     armParts[i].reset();
-    armParts[i].applyTangentialForce(forces[i]);
+    //armParts[i].applyTangentialForce(forces[i]);
+    armParts[i].applyTangentialForce(pumpForces[i]);
   }
 }
 
@@ -211,7 +213,7 @@ void draw() {
     armParts[i].setKVal(kValueSliders[j].getValue());
     armParts[i].setMass(massSliders[j].getValue());
     armParts[i].setLength(forearmLenSliders[j].getValue());
-    armParts[i].setPumpForce(pumpSliders[j].getValue());   
+    //armParts[i].setPumpForce(pumpSliders[j].getValue());   
   }
   continuousPulse = continuousPulseToggle.getState();
   renderLiftGraph();

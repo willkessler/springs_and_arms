@@ -9,7 +9,7 @@ class ArmPart {
   float highDampener;
   float angleOffParent;
   float pumpForce, thisCyclePumpForce;
-  float angleToSpringAxis, signOfForce;
+  float angleToSpringAxis, signOfForce, angleAtTopOfCycle, maxAngleAtTopOfCycle;
   int pumpForceInc;
   int armId;
   int cycleCount;
@@ -45,6 +45,7 @@ class ArmPart {
     gravityVector = new PVector(0,gravityForce);
     //angleToSpringAxisHistory = new ArrayList<Float>();
     historyTrailer = -50;
+    maxAngleAtTopOfCycle = 45;
     reset();
 
   }
@@ -178,6 +179,11 @@ class ArmPart {
       pumpForceInc = 0;
       //thisCyclePumpForce = random(0.5 * pumpForce, pumpForce);
       thisCyclePumpForce = pumpForce;
+      angleAtTopOfCycle = angleToSpringAxis;
+      println("angleAtTopOfCycle", angleAtTopOfCycle);
+      if (angleAtTopOfCycle < maxAngleAtTopOfCycle) {
+        pumpForce = pumpForce * 1.1;
+      }
     }
     
     if (pumpForceInc > -1) {
