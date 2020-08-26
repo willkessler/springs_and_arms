@@ -15,7 +15,7 @@ class ArmPart {
   int cycleCount;
   int requestedCycles;
   float lastSignOfForce;
-  ArmPart parent;
+  ArmPart parent, shoulder;
   boolean applySpringForce;
   boolean applyGravity;
   float gravityForce = .005;
@@ -23,9 +23,10 @@ class ArmPart {
   int historyTrailer;
   float LIFT_COEFFICIENT = 1.0;
   
-  ArmPart(int id, ArmPart p, PVector anc, float al, float aw, float kVal, float pf, float dampenerVal, float highDampenerVal, 
+  ArmPart(int id, ArmPart p, PVector anc,  ArmPart s, float al, float aw, float kVal, float pf, float dampenerVal, float highDampenerVal, 
           int requestedCyclesVal, float m, float angleOffParentVal ) {
     parent = p;
+    shoulder = s; // null unless not the first armPart created
     mass = m;
     k = kVal;
     armLength = al;
@@ -70,6 +71,10 @@ class ArmPart {
      PVector armVec = new PVector(armNextEnd.x - anchor.x, armNextEnd.y - anchor.y);
      armVec.normalize();
      return armVec;
+  }
+  
+  float getAngleToSpringAxis() {
+    return angleToSpringAxis;    
   }
   
   void setApplyGravity(boolean newVal) {
@@ -127,7 +132,7 @@ class ArmPart {
     tangentialAccelVector.mult(acceleration);
   }
   
-  void update() {    
+  void update(float forearmAngleToSpringAxis) {    
     if (parent != null) {
       parentArmEnd = parent.getArmEnd();
       anchor.set(parentArmEnd.x, parentArmEnd.y);
@@ -150,7 +155,17 @@ class ArmPart {
         ++cycleCount;
       }
       lastSignOfForce = signOfForce;
-      float springForce = signOfForce * k * radians(angleToSpringAxis);
+      
+      float forearmAxisEffect = 1.0;
+      if (armId > 0) {
+        forearmAxisEffect = 1.5 - (abs(shoulder.getAngleToSpringAxis()) / 50);
+        if (armId == 1) {
+          println("forearmAxisEffect", forearmAxisEffect, "shoulder",abs(shoulder.getAngleToSpringAxis()) );
+        }
+      }
+      
+      float springForce = signOfForce * k * forearmAxisEffect * radians(angleToSpringAxis);
+      //float nonLinearSpringForce = signOfForce * (1+0.5* radians(angleToSpringAxis)*radians(angleToSpringAxis));
       float springAccel = springForce / mass; // radial acceleration caused by spring
       // spring force acceleration vector is tangential to unit circle at current angle, or, opposite current velocity vector
       springForceVector.set(armVector);
@@ -180,7 +195,6 @@ class ArmPart {
       //thisCyclePumpForce = random(0.5 * pumpForce, pumpForce);
       thisCyclePumpForce = pumpForce;
       angleAtTopOfCycle = angleToSpringAxis;
-      println("angleAtTopOfCycle", angleAtTopOfCycle);
       if (angleAtTopOfCycle < maxAngleAtTopOfCycle) {
         pumpForce = pumpForce * 1.1;
       }

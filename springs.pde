@@ -1,5 +1,6 @@
   // TODO
 // X Calculate lift and drag forces for each wing section and display them
+// make the spring force on arm segments an inverse fn of the position of the first arm segment
 // Make the pump force use a bump wave fn and vary its amplitude and peak position to optimize lift
 // Vary the pump start time
 
@@ -122,6 +123,7 @@ void reset() {
     armParts[i] = new ArmPart(i, 
                               (i == 0 ? null : armParts[i-1]),
                               (i == 0 ? anchor : armParts[i-1].getArmEnd()),
+                              (i == 0 ? null : armParts[0]), // pass in the "shoulder" arm part
                               armLengths[i],
                               armWidths[i],
                               ks[i],
@@ -195,7 +197,7 @@ void draw() {
   translate(width/2,height/2);
   int i = 0;
   while (i < numArmParts) {
-    armParts[i].update();
+    armParts[i].update(armParts[0].getAngleToSpringAxis());
     armParts[i].render();
     i = i + 1;
   }
@@ -218,6 +220,7 @@ void draw() {
   continuousPulse = continuousPulseToggle.getState();
   renderLiftGraph();
 
+  //println("angle:", armParts[0].getAngleToSpringAxis());
   //println("lift", lifts[0], lifts[1], lifts[2], totalLift);
   
 };
